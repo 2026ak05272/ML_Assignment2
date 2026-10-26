@@ -81,10 +81,8 @@ The app does not train or refit models. All preprocessing and classifier steps a
 6. Add both the GitHub repository URL and deployed app URL to the submission PDF and the links below.
 
 - **GitHub repository:** https://github.com/2026ak05272/ML_Assignment2
-- **Live Streamlit app:** TODO — paste the URL shown by Streamlit Community Cloud after deployment.
+- **Live Streamlit app:** [https://telecomecustomerchurn.streamlit.app/](https://telecomecustomerchurn.streamlit.app/)
 
 ## Submission items still to complete
 
-- Add the GitHub repository URL above and publish the project.
-- Deploy the app on Streamlit Community Cloud and add its live URL here.
 - Capture the required BITS Virtual Lab screenshot and include it in the final submission PDF.
