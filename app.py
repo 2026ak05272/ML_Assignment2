@@ -140,34 +140,47 @@ st.markdown(
     .st-key-metric_picker button[aria-label="Open"] { color:#244b8d !important; background:transparent !important; border:0 !important; }
     .st-key-metric_picker div[data-testid="stWidgetLabel"] p { color:#244b8d !important; font-weight:800 !important; }
     .st-key-comparison_table_panel div[data-testid="stDataFrame"] { background:#d8e4f4; border:1px solid #bfcfe5; border-radius:14px; }
-    .diagnostic-card { background:#dce7f5; border:1px solid #c4d3e8; border-radius:20px; padding:1.15rem; min-height:300px; }
-    .diagnostic-kicker { color:#465f86; font:500 .65rem 'DM Mono',monospace; text-transform:uppercase; letter-spacing:.12em; margin-bottom:.8rem; }
-    .heatmap { width:100%; border-collapse:separate; border-spacing:6px; table-layout:fixed; }
-    .heatmap th { color:#52646d; font-size:.72rem; font-weight:700; padding:.45rem .25rem; text-align:center; }
-    .heatmap th.row-head { text-align:left; width:24%; }
-    .heatmap td { text-align:center; border-radius:13px; padding:.75rem .35rem; color:#19332f; }
+    .diagnostic-card { background:#dce7f5; border:1px solid #b9cce5; border-radius:22px; padding:1.55rem 1.7rem; min-height:350px; box-shadow:0 8px 22px #274a8020; }
+    .diagnostic-kicker { color:#465f86; font:600 .72rem 'DM Mono',monospace; text-transform:uppercase; letter-spacing:.12em; margin-bottom:1.15rem; }
+    .heatmap { width:100%; border-collapse:separate; border-spacing:10px; table-layout:fixed; }
+    .heatmap th { color:#405978; font-size:.9rem; font-weight:800; padding:.65rem .45rem; text-align:center; }
+    .heatmap th.row-head { text-align:left; width:24%; font-size:.9rem; }
+    .heatmap td { text-align:center; border-radius:16px; padding:1.25rem .65rem; color:#19332f; }
     .heatmap td.tn { background:#c5ded1; }
     .heatmap td.fp { background:#f1dfb5; }
     .heatmap td.fn { background:#eac8bd; }
     .heatmap td.tp { background:#a8cfbb; }
-    .heat-value { display:block; font-size:1.45rem; line-height:1.2; font-weight:800; letter-spacing:-.04em; }
-    .heat-share { display:block; font:500 .62rem 'DM Mono',monospace; opacity:.72; margin-top:.22rem; }
-    .heat-key { display:flex; flex-wrap:wrap; gap:.45rem 1rem; color:#51645d; font-size:.69rem; margin:.65rem .15rem 0; }
+    .heat-value { display:block; font-size:2rem; line-height:1.15; font-weight:800; letter-spacing:-.04em; }
+    .heat-share { display:block; font:600 .76rem 'DM Mono',monospace; opacity:.78; margin-top:.45rem; }
+    .heat-key { display:flex; flex-wrap:wrap; gap:.55rem 1.25rem; color:#405978; font-size:.8rem; font-weight:600; margin:.9rem .25rem 0; }
     .key-item { display:inline-flex; align-items:center; gap:.35rem; }
     .key-swatch { display:inline-block; width:10px; height:10px; border-radius:3px; }
     .key-swatch.good { background:#a8cfbb; }
     .key-swatch.warn { background:#f1dfb5; }
     .key-swatch.miss { background:#eac8bd; }
-    .report-table { width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:13px; background:#edf2f3; font-size:.78rem; }
-    .report-table th { background:#d5e0e2; color:#334b52; text-align:left; font-size:.67rem; text-transform:uppercase; letter-spacing:.06em; padding:.7rem .55rem; }
-    .report-table td { color:#283b43; padding:.72rem .55rem; border-top:1px solid #dce5e6; vertical-align:middle; }
+    .report-table { width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:16px; background:#e5edf8; font-size:.94rem; }
+    .report-table th { background:#cbdaf0; color:#203d73; text-align:left; font-size:.79rem; text-transform:uppercase; letter-spacing:.07em; padding:1rem .85rem; }
+    .report-table td { color:#223a5a; padding:1.05rem .85rem; border-top:1px solid #cbd9ea; vertical-align:middle; }
     .report-table tr:nth-child(even) td { background:#e7eef0; }
     .class-name { font-weight:800; white-space:nowrap; }
-    .score-cell { min-width:70px; }
-    .score-value { display:flex; justify-content:space-between; font:500 .68rem 'DM Mono',monospace; margin-bottom:.28rem; }
-    .score-track { height:5px; background:#d4dfe0; border-radius:10px; overflow:hidden; }
+    .score-cell { min-width:100px; }
+    .score-value { display:flex; justify-content:space-between; font:600 .82rem 'DM Mono',monospace; margin-bottom:.4rem; }
+    .score-track { height:8px; background:#cbd9ea; border-radius:10px; overflow:hidden; }
     .score-fill { display:block; height:100%; border-radius:10px; background:#648b78; }
     .report-support { color:#687b80; font:500 .7rem 'DM Mono',monospace; }
+        @media (max-width:760px) {
+            .diagnostic-card { padding:1rem .75rem; min-height:0; }
+            .heatmap { border-spacing:5px; }
+            .heatmap th, .heatmap th.row-head { font-size:.68rem; padding:.4rem .15rem; }
+            .heatmap td { padding:.85rem .25rem; }
+            .heat-value { font-size:1.45rem; }
+            .heat-share { font-size:.56rem; }
+            .heat-key { font-size:.65rem; gap:.4rem .7rem; }
+            .report-table { font-size:.75rem; }
+            .report-table th { font-size:.61rem; padding:.7rem .35rem; }
+            .report-table td { padding:.75rem .35rem; }
+            .score-cell { min-width:65px; }
+        }
     .footnote { color:var(--muted); font-size:.76rem; border-top:1px solid var(--line); padding-top:1rem; margin-top:2.2rem; }
     </style>
     <div class="brand"><div class="brand-mark">◈</div><div><div class="brand-word">CHURN ATLAS</div><div class="brand-sub">Customer intelligence / ML lab</div></div></div>
