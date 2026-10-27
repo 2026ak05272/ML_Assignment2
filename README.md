@@ -67,9 +67,9 @@ Telecom_Churn_Classification/
 1. Install the packages listed in `requirements.txt`.
 2. Run `python train_models.py` once to build the five saved pipelines and the reproducible held-out test CSV.
 3. Run `streamlit run app.py` and open the local URL printed in the terminal (normally `http://localhost:8501`).
-4. Select a model, upload a labeled test CSV (or use the bundled test set), and inspect the metrics, confusion matrix, and classification report.
+4. The dashboard opens with a dataset overview. Download the bundled sample from the sidebar or upload your own labeled test CSV to reveal all five model results, the comparison chart, confusion matrix, report, and metric-led observations.
 
-The app does not train or refit models. All preprocessing and classifier steps are persisted together in each model pipeline. The trainer reads the supplied sample CSV from its sibling `Sample Data/Classification/Telecome Customer Churn/` folder; the saved models and test CSV are included for running the app independently.
+The app does not train or refit models. All preprocessing and classifier steps are persisted together in each model pipeline. The trainer reads the supplied sample CSV from its sibling `Sample Data/Classification/Telecome Customer Churn/` folder; the saved models and test CSV are included for running the app independently. The app expects an uploaded test CSV before displaying evaluation results and accepts up to 5 MB / 20,000 rows.
 
 ## Deploy to Streamlit Community Cloud
 
@@ -77,7 +77,7 @@ The app does not train or refit models. All preprocessing and classifier steps a
 2. Open [Streamlit Community Cloud](https://share.streamlit.io/) and sign in with the GitHub account that can access the repository.
 3. Select **Create app**, choose the repository and branch, and set the main file path to `app.py`.
 4. Select **Deploy** and wait for the build to finish. The app should load using the committed model artifacts; model training is not required in the cloud.
-5. Open the resulting public app URL and verify model selection, metrics, CSV upload, confusion matrix, and classification report.
+5. Open the resulting public app URL and verify the dataset overview, sample download, CSV upload, five-model comparison, confusion matrix, and classification report.
 6. Add both the GitHub repository URL and deployed app URL to the submission PDF and the links below.
 
 - **GitHub repository:** https://github.com/2026ak05272/ML_Assignment2
