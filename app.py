@@ -168,6 +168,27 @@ st.markdown(
     .score-track { height:8px; background:#cbd9ea; border-radius:10px; overflow:hidden; }
     .score-fill { display:block; height:100%; border-radius:10px; background:#648b78; }
     .report-support { color:#687b80; font:500 .7rem 'DM Mono',monospace; }
+        .performance-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(265px,1fr)); gap:1rem; margin:.8rem 0 1.15rem; }
+        .performance-card { min-height:205px; padding:1.15rem 1.2rem; border-radius:18px; border:1px solid #c2d2e8; background:linear-gradient(145deg,#e1eaf7,#d4e1f2); box-shadow:0 6px 16px #274a8012; display:flex; flex-direction:column; gap:.75rem; }
+        .performance-head { display:flex; justify-content:space-between; align-items:flex-start; gap:.6rem; }
+        .performance-name { color:#1e3b6b; font-size:1.02rem; line-height:1.25; font-weight:800; letter-spacing:-.025em; }
+        .performance-rank { flex:0 0 auto; border-radius:20px; padding:.25rem .55rem; background:#c2d4f0; color:#294e88; font:600 .61rem 'DM Mono',monospace; white-space:nowrap; }
+        .leader-badges { display:flex; flex-wrap:wrap; gap:.35rem; min-height:1.45rem; }
+        .leader-badge { border-radius:20px; padding:.23rem .52rem; color:#183e70; background:#bbd1f1; font:600 .6rem 'DM Mono',monospace; }
+        .leader-empty { color:#60748f; font-size:.66rem; }
+        .performance-copy { color:#415b7b; font-size:.78rem; line-height:1.5; min-height:2.3rem; }
+        .performance-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:.45rem; margin-top:auto; }
+        .performance-stat { border-radius:10px; padding:.48rem .55rem; background:#c8d8ee; }
+        .performance-stat-label { color:#526987; font:500 .56rem 'DM Mono',monospace; text-transform:uppercase; letter-spacing:.06em; }
+        .performance-stat-value { color:#1c3d6c; font:700 .88rem 'DM Mono',monospace; margin-top:.15rem; }
+        .overall-card { border-radius:20px; padding:1.2rem 1.4rem; margin:.6rem 0 1.1rem; color:#f2f6ff; background:linear-gradient(110deg,#1d396b,#315fa8); box-shadow:0 9px 22px #24478325; }
+        .overall-kicker { color:#bfd3fa; font:600 .63rem 'DM Mono',monospace; text-transform:uppercase; letter-spacing:.13em; }
+        .overall-title { font-size:1.15rem; font-weight:800; margin:.35rem 0 .3rem; }
+        .overall-copy { color:#e0eaff; font-size:.82rem; line-height:1.55; }
+        @media (max-width:760px) {
+            .performance-grid { grid-template-columns:1fr; gap:.7rem; }
+            .performance-card { min-height:0; }
+        }
         @media (max-width:760px) {
             .diagnostic-card { padding:1rem .75rem; min-height:0; }
             .heatmap { border-spacing:5px; }
@@ -511,22 +532,66 @@ report_html = (
 )
 st.markdown(report_html, unsafe_allow_html=True)
 
-st.markdown("#### Performance notes")
-notes = []
-for model_name, row in comparison.iterrows():
-    leaders = [metric for metric in summary_metrics if comparison[metric].idxmax() == model_name]
-    lead_note = f"Leads in {', '.join(leaders)}. " if leaders else ""
-    notes.append(
-        {
-            "Model": model_name,
-            "Observation": (
-                f"{lead_note}Accuracy {row['Accuracy']:.3f}; AUC {row['AUC']:.3f}; "
-                f"precision {row['Precision']:.3f}; recall {row['Recall']:.3f}; "
-                f"F1 {row['F1']:.3f}; MCC {row['MCC']:.3f}."
-            ),
-        }
+st.markdown('<div class="section-title">Performance notes</div>', unsafe_allow_html=True)
+st.caption("A quick reading of each model's strengths on the same uploaded test records.")
+
+metric_leaders = {
+    metric: comparison[metric].idxmax()
+    for metric in summary_metrics
+}
+ranked_models = comparison.sort_values(["F1", "MCC"], ascending=False).index.tolist()
+performance_cards = []
+for model_name in model_names:
+    row = comparison.loc[model_name]
+    leaders = [metric for metric, leader in metric_leaders.items() if leader == model_name]
+    badges = "".join(f'<span class="leader-badge">TOP {metric.upper()}</span>' for metric in leaders)
+    if not badges:
+        badges = '<span class="leader-empty">Balanced benchmark · no single-metric lead</span>'
+
+    observations = []
+    if "Recall" in leaders:
+        observations.append("Catches the most actual churners, though it may flag more customers overall.")
+    elif row["Recall"] >= 0.78:
+        observations.append("Strong at identifying churners, which helps reduce missed churn cases.")
+    elif row["Recall"] < 0.60:
+        observations.append("Lower churn recall means more actual churners may be missed.")
+    if "Precision" in leaders:
+        observations.append("Its churn alerts are the most precise among the models.")
+    elif row["Precision"] < 0.52 and row["Recall"] >= 0.75:
+        observations.append("The higher recall comes with more false churn alerts.")
+    if "AUC" in leaders:
+        observations.append("Best at ranking customers by churn risk.")
+    if not observations:
+        observations.append("A middle-ground result; compare F1 and MCC for overall balance.")
+    observations.append(f"Ranked #{ranked_models.index(model_name) + 1} by F1, then MCC.")
+
+    stats_html = "".join(
+        f'<div class="performance-stat"><div class="performance-stat-label">{metric}</div>'
+        f'<div class="performance-stat-value">{row[metric]:.3f}</div></div>'
+        for metric in ["F1", "AUC", "Recall"]
     )
-st.dataframe(pd.DataFrame(notes).set_index("Model"), width="stretch")
+    performance_cards.append(
+        '<div class="performance-card">'
+        f'<div class="performance-head"><div class="performance-name">{model_name}</div>'
+        f'<span class="performance-rank">F1 RANK #{ranked_models.index(model_name) + 1}</span></div>'
+        f'<div class="leader-badges">{badges}</div>'
+        f'<div class="performance-copy">{" ".join(observations)}</div>'
+        f'<div class="performance-stats">{stats_html}</div>'
+        '</div>'
+    )
+
+st.markdown('<div class="performance-grid">' + "".join(performance_cards) + '</div>', unsafe_allow_html=True)
+balanced_winner = ranked_models[0]
+st.markdown(
+    '<div class="overall-card">'
+    '<div class="overall-kicker">Overall takeaway</div>'
+    f'<div class="overall-title">{balanced_winner} is the most balanced choice on these results.</div>'
+    f'<div class="overall-copy">It leads by F1 ({comparison.loc[balanced_winner, "F1"]:.3f}) and MCC '
+    f'({comparison.loc[balanced_winner, "MCC"]:.3f}). {best_auc_model} has the strongest AUC '
+    f'({comparison.loc[best_auc_model, "AUC"]:.3f}), so it may be preferable when ranking churn risk matters most.</div>'
+    '</div>',
+    unsafe_allow_html=True,
+)
 st.caption("Models were loaded from saved artifacts. Uploaded rows were used only for evaluation; no training or fitting occurred.")
 st.markdown(
     '<div class="footnote">CHURN ATLAS · ML ASSIGNMENT 2 · FIVE SAVED CLASSIFIERS · EVALUATION ONLY</div>',
