@@ -93,36 +93,42 @@ st.markdown(
     """
     <style>
     @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
-    :root { --ink:#192b35; --muted:#60717a; --paper:#e9efeb; --line:#d2ded7; --green:#bdd867; --deep:#173b36; }
+    :root { --ink:#172a43; --muted:#5e7088; --paper:#eaf0f8; --line:#cfdaea; --green:#9ebcff; --deep:#203d73; }
     html, body, [class*="css"] { font-family: 'Manrope', sans-serif; }
     .stApp { background:var(--paper); color:var(--ink); }
-    [data-testid="stSidebar"] { background:#e9eee5; border-right:1px solid var(--line); }
+    [data-testid="stSidebar"] { background:#e2eaf5; border-right:1px solid var(--line); }
     [data-testid="stSidebar"] > div:first-child { padding-top:1.4rem; }
     .block-container { max-width:1420px; padding-top:2rem; padding-bottom:4rem; }
     .brand { display:flex; align-items:center; gap:12px; margin:0 0 1.8rem; }
     .brand-mark { width:42px; height:42px; display:grid; place-items:center; background:var(--green); color:var(--deep); border-radius:14px; font-size:22px; font-weight:800; }
     .brand-word { font-size:1.08rem; line-height:1.05; font-weight:800; letter-spacing:-.04em; }
     .brand-sub { color:var(--muted); font:500 .62rem 'DM Mono',monospace; text-transform:uppercase; letter-spacing:.13em; margin-top:5px; }
-    .eyebrow { color:#587067; font:500 .68rem 'DM Mono',monospace; letter-spacing:.17em; text-transform:uppercase; }
-    .hero { border-radius:26px; padding:2.1rem 2.25rem; color:#f2f4e9; background:#173b36; position:relative; overflow:hidden; margin:.6rem 0 1.2rem; }
-    .hero:after { content:'◈'; position:absolute; right:40px; top:-54px; color:#bdd867; opacity:.92; font-size:205px; line-height:1; transform:rotate(12deg); }
+    .eyebrow { color:#526a91; font:500 .68rem 'DM Mono',monospace; letter-spacing:.17em; text-transform:uppercase; }
+    .hero { border-radius:26px; padding:2.1rem 2.25rem; color:#f3f6ff; background:linear-gradient(115deg,#182f5a 0%,#254b91 68%,#356ac0 100%); position:relative; overflow:hidden; margin:.6rem 0 1.2rem; }
+    .hero:after { content:'◈'; position:absolute; right:40px; top:-54px; color:#a9c5ff; opacity:.82; font-size:205px; line-height:1; transform:rotate(12deg); }
     .hero h1 { font-size:clamp(2rem,4vw,3.55rem); letter-spacing:-.075em; line-height:1.03; margin:.55rem 0 .7rem; max-width:720px; }
-    .hero p { color:#d5e0d4; max-width:680px; font-size:.98rem; line-height:1.65; margin:0; }
-    .hero .eyebrow { color:#bdd867; }
+    .hero p { color:#dce7ff; max-width:680px; font-size:.98rem; line-height:1.65; margin:0; }
+    .hero .eyebrow { color:#b8ceff; }
     .section-title { font-size:1.3rem; font-weight:800; letter-spacing:-.04em; margin:.35rem 0 .25rem; }
     .muted { color:var(--muted); font-size:.9rem; line-height:1.55; }
-    .data-card { border:1px solid var(--line); background:#f4f7f3; border-radius:18px; padding:1.1rem 1.2rem; min-height:112px; }
+    .data-card { border:1px solid #cbd9ef; background:linear-gradient(145deg,#f0f5fc,#dfe9f8); border-radius:18px; padding:1.1rem 1.2rem; min-height:112px; }
     .data-label { color:var(--muted); font:500 .66rem 'DM Mono',monospace; text-transform:uppercase; letter-spacing:.1em; }
     .data-value { color:var(--ink); font-size:1.9rem; font-weight:800; letter-spacing:-.06em; margin-top:.45rem; }
     .data-note { color:var(--muted); font-size:.76rem; margin-top:.1rem; }
-    .step-tag { display:inline-block; color:var(--deep); background:#e3ecc6; padding:.4rem .7rem; border-radius:30px; font:500 .68rem 'DM Mono',monospace; letter-spacing:.06em; }
-    .upload-hint { border:1px dashed #98a995; border-radius:18px; background:#eff2e9; padding:1rem 1.2rem; margin:.5rem 0; }
-    div[data-testid="stMetric"] { background:#f1f5f1; border:1px solid var(--line); border-radius:16px; padding:1rem; }
+    .step-tag { display:inline-block; color:#274a8c; background:#d8e5fb; padding:.4rem .7rem; border-radius:30px; font:500 .68rem 'DM Mono',monospace; letter-spacing:.06em; }
+    .upload-hint { border:1px dashed #91a9ce; border-radius:18px; background:#e1eafa; padding:1rem 1.2rem; margin:.5rem 0; }
+    div[data-testid="stMetric"] { background:#e4ecf8; border:1px solid var(--line); border-radius:16px; padding:1rem; }
     div[data-testid="stMetric"] label { color:var(--muted); }
     .stButton > button[kind="primary"] { background:var(--deep); border-color:var(--deep); border-radius:12px; font-weight:700; }
     div[data-testid="stDataFrame"] { border:1px solid var(--line); border-radius:14px; overflow:hidden; }
-    .diagnostic-card { background:#e2ebe6; border:1px solid #cbd9d1; border-radius:20px; padding:1.15rem; min-height:300px; }
-    .diagnostic-kicker { color:#587067; font:500 .65rem 'DM Mono',monospace; text-transform:uppercase; letter-spacing:.12em; margin-bottom:.8rem; }
+    .scorecard-col { min-width:0; }
+    .scorecard-tile { min-height:150px; height:100%; box-sizing:border-box; padding:1rem .95rem .9rem; border-radius:18px; color:#f5f8ff; background:linear-gradient(150deg,#244783 0%,#315ca8 64%,#3e6ec0 100%); border:1px solid #244c92; box-shadow:0 7px 18px #24478320; display:flex; flex-direction:column; justify-content:space-between; gap:.7rem; }
+    .scorecard-label { color:#dce7ff; font:600 .68rem 'DM Mono',monospace; text-transform:uppercase; letter-spacing:.1em; }
+    .scorecard-value { color:#fff; font-size:clamp(1.7rem,2.4vw,2.35rem); line-height:1; font-weight:700; letter-spacing:-.06em; font-variant-numeric:tabular-nums; }
+    .scorecard-leader { display:block; color:#edf3ff; font-size:.67rem; line-height:1.4; font-weight:600; overflow-wrap:anywhere; }
+    .scorecard-leader span { display:block; color:#bcd1ff; font:500 .56rem 'DM Mono',monospace; text-transform:uppercase; letter-spacing:.1em; margin-bottom:.12rem; }
+    .diagnostic-card { background:#dce7f5; border:1px solid #c4d3e8; border-radius:20px; padding:1.15rem; min-height:300px; }
+    .diagnostic-kicker { color:#465f86; font:500 .65rem 'DM Mono',monospace; text-transform:uppercase; letter-spacing:.12em; margin-bottom:.8rem; }
     .heatmap { width:100%; border-collapse:separate; border-spacing:6px; table-layout:fixed; }
     .heatmap th { color:#52646d; font-size:.72rem; font-weight:700; padding:.45rem .25rem; text-align:center; }
     .heatmap th.row-head { text-align:left; width:24%; }
@@ -323,7 +329,14 @@ summary_metrics = ["Accuracy", "AUC", "Precision", "Recall", "F1", "MCC"]
 metric_columns = st.columns(len(summary_metrics), gap="small")
 for column, metric_name in zip(metric_columns, summary_metrics):
     best_name = comparison[metric_name].idxmax()
-    column.metric(metric_name, f"{comparison.loc[best_name, metric_name]:.3f}", f"Best: {best_name}")
+    column.markdown(
+        f'<div class="scorecard-tile">'
+        f'<div class="scorecard-label">{metric_name}</div>'
+        f'<div class="scorecard-value">{comparison.loc[best_name, metric_name]:.3f}</div>'
+        f'<div class="scorecard-leader"><span>Metric leader</span>{best_name}</div>'
+        f'</div>',
+        unsafe_allow_html=True,
+    )
 
 chart_column, table_column = st.columns([0.85, 1.15], gap="large")
 with chart_column:
