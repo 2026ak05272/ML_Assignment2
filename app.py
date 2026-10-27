@@ -82,9 +82,10 @@ def evaluate_all_models(data: pd.DataFrame, model_entries: tuple[tuple[str, str,
                 labels=[0, 1],
                 target_names=["No churn", "Churn"],
                 zero_division=0,
-                output_dict=False,
+                output_dict=True,
             ),
         }
+        results[model_name]["report"]["accuracy"] = float(accuracy_score(y_true, predictions))
     return y_true.tolist(), results
 
 
@@ -92,7 +93,7 @@ st.markdown(
     """
     <style>
     @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
-    :root { --ink:#192b35; --muted:#60717a; --paper:#f5f4ee; --line:#dce1d7; --green:#bdd867; --deep:#173b36; }
+    :root { --ink:#192b35; --muted:#60717a; --paper:#e9efeb; --line:#d2ded7; --green:#bdd867; --deep:#173b36; }
     html, body, [class*="css"] { font-family: 'Manrope', sans-serif; }
     .stApp { background:var(--paper); color:var(--ink); }
     [data-testid="stSidebar"] { background:#e9eee5; border-right:1px solid var(--line); }
@@ -110,16 +111,44 @@ st.markdown(
     .hero .eyebrow { color:#bdd867; }
     .section-title { font-size:1.3rem; font-weight:800; letter-spacing:-.04em; margin:.35rem 0 .25rem; }
     .muted { color:var(--muted); font-size:.9rem; line-height:1.55; }
-    .data-card { border:1px solid var(--line); background:#fffefa; border-radius:18px; padding:1.1rem 1.2rem; min-height:112px; }
+    .data-card { border:1px solid var(--line); background:#f4f7f3; border-radius:18px; padding:1.1rem 1.2rem; min-height:112px; }
     .data-label { color:var(--muted); font:500 .66rem 'DM Mono',monospace; text-transform:uppercase; letter-spacing:.1em; }
     .data-value { color:var(--ink); font-size:1.9rem; font-weight:800; letter-spacing:-.06em; margin-top:.45rem; }
     .data-note { color:var(--muted); font-size:.76rem; margin-top:.1rem; }
     .step-tag { display:inline-block; color:var(--deep); background:#e3ecc6; padding:.4rem .7rem; border-radius:30px; font:500 .68rem 'DM Mono',monospace; letter-spacing:.06em; }
     .upload-hint { border:1px dashed #98a995; border-radius:18px; background:#eff2e9; padding:1rem 1.2rem; margin:.5rem 0; }
-    div[data-testid="stMetric"] { background:#fffefa; border:1px solid var(--line); border-radius:16px; padding:1rem; }
+    div[data-testid="stMetric"] { background:#f1f5f1; border:1px solid var(--line); border-radius:16px; padding:1rem; }
     div[data-testid="stMetric"] label { color:var(--muted); }
     .stButton > button[kind="primary"] { background:var(--deep); border-color:var(--deep); border-radius:12px; font-weight:700; }
     div[data-testid="stDataFrame"] { border:1px solid var(--line); border-radius:14px; overflow:hidden; }
+    .diagnostic-card { background:#e2ebe6; border:1px solid #cbd9d1; border-radius:20px; padding:1.15rem; min-height:300px; }
+    .diagnostic-kicker { color:#587067; font:500 .65rem 'DM Mono',monospace; text-transform:uppercase; letter-spacing:.12em; margin-bottom:.8rem; }
+    .heatmap { width:100%; border-collapse:separate; border-spacing:6px; table-layout:fixed; }
+    .heatmap th { color:#52646d; font-size:.72rem; font-weight:700; padding:.45rem .25rem; text-align:center; }
+    .heatmap th.row-head { text-align:left; width:24%; }
+    .heatmap td { text-align:center; border-radius:13px; padding:.75rem .35rem; color:#19332f; }
+    .heatmap td.tn { background:#c5ded1; }
+    .heatmap td.fp { background:#f1dfb5; }
+    .heatmap td.fn { background:#eac8bd; }
+    .heatmap td.tp { background:#a8cfbb; }
+    .heat-value { display:block; font-size:1.45rem; line-height:1.2; font-weight:800; letter-spacing:-.04em; }
+    .heat-share { display:block; font:500 .62rem 'DM Mono',monospace; opacity:.72; margin-top:.22rem; }
+    .heat-key { display:flex; flex-wrap:wrap; gap:.45rem 1rem; color:#51645d; font-size:.69rem; margin:.65rem .15rem 0; }
+    .key-item { display:inline-flex; align-items:center; gap:.35rem; }
+    .key-swatch { display:inline-block; width:10px; height:10px; border-radius:3px; }
+    .key-swatch.good { background:#a8cfbb; }
+    .key-swatch.warn { background:#f1dfb5; }
+    .key-swatch.miss { background:#eac8bd; }
+    .report-table { width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:13px; background:#edf2f3; font-size:.78rem; }
+    .report-table th { background:#d5e0e2; color:#334b52; text-align:left; font-size:.67rem; text-transform:uppercase; letter-spacing:.06em; padding:.7rem .55rem; }
+    .report-table td { color:#283b43; padding:.72rem .55rem; border-top:1px solid #dce5e6; vertical-align:middle; }
+    .report-table tr:nth-child(even) td { background:#e7eef0; }
+    .class-name { font-weight:800; white-space:nowrap; }
+    .score-cell { min-width:70px; }
+    .score-value { display:flex; justify-content:space-between; font:500 .68rem 'DM Mono',monospace; margin-bottom:.28rem; }
+    .score-track { height:5px; background:#d4dfe0; border-radius:10px; overflow:hidden; }
+    .score-fill { display:block; height:100%; border-radius:10px; background:#648b78; }
+    .report-support { color:#687b80; font:500 .7rem 'DM Mono',monospace; }
     .footnote { color:var(--muted); font-size:.76rem; border-top:1px solid var(--line); padding-top:1rem; margin-top:2.2rem; }
     </style>
     <div class="brand"><div class="brand-mark">◈</div><div><div class="brand-word">CHURN ATLAS</div><div class="brand-sub">Customer intelligence / ML lab</div></div></div>
@@ -339,16 +368,65 @@ left_diag, right_diag = st.columns([0.9, 1.1], gap="large")
 with left_diag:
     st.markdown("#### Confusion matrix")
     matrix = confusion_matrix(y_true, y_pred, labels=[0, 1])
-    matrix_frame = pd.DataFrame(
-        matrix,
-        index=["Actual · stayed", "Actual · churned"],
-        columns=["Predicted · stayed", "Predicted · churned"],
+    row_totals = matrix.sum(axis=1)
+    heatmap_rows = []
+    for row_index, row_label, cell_labels, cell_classes in [
+        (0, "Stayed", ["Correct stay", "False alarm"], ["tn", "fp"]),
+        (1, "Churned", ["Missed churn", "Correct alert"], ["fn", "tp"]),
+    ]:
+        cells = []
+        for column_index, (cell_label, cell_class) in enumerate(zip(cell_labels, cell_classes)):
+            share = matrix[row_index, column_index] / row_totals[row_index] if row_totals[row_index] else 0
+            cells.append(
+                f'<td class="{cell_class}" title="{cell_label}">'
+                f'<span class="heat-value">{matrix[row_index, column_index]:,}</span>'
+                f'<span class="heat-share">{share:.0%} of actual {row_label.lower()}</span></td>'
+            )
+        heatmap_rows.append(f'<tr><th class="row-head">Actual {row_label.lower()}</th>{"".join(cells)}</tr>')
+    heatmap_html = (
+        '<div class="diagnostic-card"><div class="diagnostic-kicker">Actual outcomes × model predictions</div>'
+        '<table class="heatmap"><thead><tr><th></th><th>Predicted · stayed</th>'
+        '<th>Predicted · churned</th></tr></thead><tbody>'
+        + "".join(heatmap_rows)
+        + '</tbody></table><div class="heat-key">'
+        '<span class="key-item"><i class="key-swatch good"></i>Correct decisions</span>'
+        '<span class="key-item"><i class="key-swatch warn"></i>False alarms</span>'
+        '<span class="key-item"><i class="key-swatch miss"></i>Missed churn</span>'
+        '</div></div>'
     )
-    st.dataframe(matrix_frame, width="stretch")
+    st.markdown(heatmap_html, unsafe_allow_html=True)
     st.caption(f"Correct churn alerts: {true_positives:,} · False alarms: {false_positives:,} · Missed churners: {false_negatives:,}")
 with right_diag:
     st.markdown("#### Classification report")
-    st.code(chosen_result["report"], language="text")
+    report_data = chosen_result["report"]
+    report_metrics = ["precision", "recall", "f1-score"]
+    report_rows = []
+    for class_name, label in [("No churn", "Stayed"), ("Churn", "Churned"), ("macro avg", "Macro avg"), ("weighted avg", "Weighted avg")]:
+        row = report_data[class_name]
+        score_cells = []
+        for metric in report_metrics:
+            value = float(row[metric])
+            score_cells.append(
+                f'<td class="score-cell"><div class="score-value"><span>{value:.2f}</span></div>'
+                f'<div class="score-track"><span class="score-fill" style="width:{value * 100:.1f}%"></span></div></td>'
+            )
+        support = int(row["support"])
+        report_rows.append(
+            f'<tr><td class="class-name">{label}</td>{"".join(score_cells)}'
+            f'<td class="report-support">{support:,}</td></tr>'
+        )
+    accuracy_value = float(report_data["accuracy"])
+    report_html = (
+        '<div class="diagnostic-card"><div class="diagnostic-kicker">Per-class quality · positive class is churn</div>'
+        '<table class="report-table"><thead><tr><th>Class</th><th>Precision</th><th>Recall</th>'
+        '<th>F1 score</th><th>Support</th></tr></thead><tbody>'
+        + "".join(report_rows)
+        + f'</tbody></table><div style="display:flex;align-items:center;gap:.65rem;margin:.85rem .15rem .05rem;">'
+        f'<span style="background:#d6e5db;border-radius:10px;padding:.55rem .7rem;font-size:.73rem;font-weight:800;color:#28483a;">Overall accuracy</span>'
+        f'<span style="background:#fffefa;border:1px solid #d5e0e2;border-radius:10px;padding:.55rem .7rem;font:600 .78rem \'DM Mono\',monospace;color:#28483a;">{accuracy_value:.3f}</span>'
+        '</div></div>'
+    )
+    st.markdown(report_html, unsafe_allow_html=True)
 
 st.markdown("#### Performance notes")
 notes = []
