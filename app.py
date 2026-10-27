@@ -434,69 +434,69 @@ true_positives = sum(actual == 1 and predicted == 1 for actual, predicted in zip
 false_positives = sum(actual == 0 and predicted == 1 for actual, predicted in zip(y_true, y_pred))
 false_negatives = sum(actual == 1 and predicted == 0 for actual, predicted in zip(y_true, y_pred))
 
-left_diag, right_diag = st.columns([0.9, 1.1], gap="large")
-with left_diag:
-    st.markdown("#### Confusion matrix")
-    matrix = confusion_matrix(y_true, y_pred, labels=[0, 1])
-    row_totals = matrix.sum(axis=1)
-    heatmap_rows = []
-    for row_index, row_label, cell_labels, cell_classes in [
-        (0, "Stayed", ["Correct stay", "False alarm"], ["tn", "fp"]),
-        (1, "Churned", ["Missed churn", "Correct alert"], ["fn", "tp"]),
-    ]:
-        cells = []
-        for column_index, (cell_label, cell_class) in enumerate(zip(cell_labels, cell_classes)):
-            share = matrix[row_index, column_index] / row_totals[row_index] if row_totals[row_index] else 0
-            cells.append(
-                f'<td class="{cell_class}" title="{cell_label}">'
-                f'<span class="heat-value">{matrix[row_index, column_index]:,}</span>'
-                f'<span class="heat-share">{share:.0%} of actual {row_label.lower()}</span></td>'
-            )
-        heatmap_rows.append(f'<tr><th class="row-head">Actual {row_label.lower()}</th>{"".join(cells)}</tr>')
-    heatmap_html = (
-        '<div class="diagnostic-card"><div class="diagnostic-kicker">Actual outcomes × model predictions</div>'
-        '<table class="heatmap"><thead><tr><th></th><th>Predicted · stayed</th>'
-        '<th>Predicted · churned</th></tr></thead><tbody>'
-        + "".join(heatmap_rows)
-        + '</tbody></table><div class="heat-key">'
-        '<span class="key-item"><i class="key-swatch good"></i>Correct decisions</span>'
-        '<span class="key-item"><i class="key-swatch warn"></i>False alarms</span>'
-        '<span class="key-item"><i class="key-swatch miss"></i>Missed churn</span>'
-        '</div></div>'
-    )
-    st.markdown(heatmap_html, unsafe_allow_html=True)
-    st.caption(f"Correct churn alerts: {true_positives:,} · False alarms: {false_positives:,} · Missed churners: {false_negatives:,}")
-with right_diag:
-    st.markdown("#### Classification report")
-    report_data = chosen_result["report"]
-    report_metrics = ["precision", "recall", "f1-score"]
-    report_rows = []
-    for class_name, label in [("No churn", "Stayed"), ("Churn", "Churned"), ("macro avg", "Macro avg"), ("weighted avg", "Weighted avg")]:
-        row = report_data[class_name]
-        score_cells = []
-        for metric in report_metrics:
-            value = float(row[metric])
-            score_cells.append(
-                f'<td class="score-cell"><div class="score-value"><span>{value:.2f}</span></div>'
-                f'<div class="score-track"><span class="score-fill" style="width:{value * 100:.1f}%"></span></div></td>'
-            )
-        support = int(row["support"])
-        report_rows.append(
-            f'<tr><td class="class-name">{label}</td>{"".join(score_cells)}'
-            f'<td class="report-support">{support:,}</td></tr>'
+st.markdown('<div class="section-title">Confusion matrix</div>', unsafe_allow_html=True)
+st.caption(f"Selected classifier: {detail_model} · Rows are actual labels; columns are predictions.")
+matrix = confusion_matrix(y_true, y_pred, labels=[0, 1])
+row_totals = matrix.sum(axis=1)
+heatmap_rows = []
+for row_index, row_label, cell_labels, cell_classes in [
+    (0, "Stayed", ["Correct stay", "False alarm"], ["tn", "fp"]),
+    (1, "Churned", ["Missed churn", "Correct alert"], ["fn", "tp"]),
+]:
+    cells = []
+    for column_index, (cell_label, cell_class) in enumerate(zip(cell_labels, cell_classes)):
+        share = matrix[row_index, column_index] / row_totals[row_index] if row_totals[row_index] else 0
+        cells.append(
+            f'<td class="{cell_class}" title="{cell_label}">'
+            f'<span class="heat-value">{matrix[row_index, column_index]:,}</span>'
+            f'<span class="heat-share">{share:.0%} of actual {row_label.lower()}</span></td>'
         )
-    accuracy_value = float(report_data["accuracy"])
-    report_html = (
-        '<div class="diagnostic-card"><div class="diagnostic-kicker">Per-class quality · positive class is churn</div>'
-        '<table class="report-table"><thead><tr><th>Class</th><th>Precision</th><th>Recall</th>'
-        '<th>F1 score</th><th>Support</th></tr></thead><tbody>'
-        + "".join(report_rows)
-        + f'</tbody></table><div style="display:flex;align-items:center;gap:.65rem;margin:.85rem .15rem .05rem;">'
-        f'<span style="background:#d6e5db;border-radius:10px;padding:.55rem .7rem;font-size:.73rem;font-weight:800;color:#28483a;">Overall accuracy</span>'
-        f'<span style="background:#fffefa;border:1px solid #d5e0e2;border-radius:10px;padding:.55rem .7rem;font:600 .78rem \'DM Mono\',monospace;color:#28483a;">{accuracy_value:.3f}</span>'
-        '</div></div>'
+    heatmap_rows.append(f'<tr><th class="row-head">Actual {row_label.lower()}</th>{"".join(cells)}</tr>')
+heatmap_html = (
+    '<div class="diagnostic-card"><div class="diagnostic-kicker">Actual outcomes × model predictions</div>'
+    '<table class="heatmap"><thead><tr><th></th><th>Predicted · stayed</th>'
+    '<th>Predicted · churned</th></tr></thead><tbody>'
+    + "".join(heatmap_rows)
+    + '</tbody></table><div class="heat-key">'
+    '<span class="key-item"><i class="key-swatch good"></i>Correct decisions</span>'
+    '<span class="key-item"><i class="key-swatch warn"></i>False alarms</span>'
+    '<span class="key-item"><i class="key-swatch miss"></i>Missed churn</span>'
+    '</div></div>'
+)
+st.markdown(heatmap_html, unsafe_allow_html=True)
+st.caption(f"Correct churn alerts: {true_positives:,} · False alarms: {false_positives:,} · Missed churners: {false_negatives:,}")
+
+st.markdown('<div class="section-title" style="margin-top:2rem">Classification report</div>', unsafe_allow_html=True)
+st.caption("Per-class precision, recall, and F1 score for the selected classifier.")
+report_data = chosen_result["report"]
+report_metrics = ["precision", "recall", "f1-score"]
+report_rows = []
+for class_name, label in [("No churn", "Stayed"), ("Churn", "Churned"), ("macro avg", "Macro avg"), ("weighted avg", "Weighted avg")]:
+    row = report_data[class_name]
+    score_cells = []
+    for metric in report_metrics:
+        value = float(row[metric])
+        score_cells.append(
+            f'<td class="score-cell"><div class="score-value"><span>{value:.2f}</span></div>'
+            f'<div class="score-track"><span class="score-fill" style="width:{value * 100:.1f}%"></span></div></td>'
+        )
+    support = int(row["support"])
+    report_rows.append(
+        f'<tr><td class="class-name">{label}</td>{"".join(score_cells)}'
+        f'<td class="report-support">{support:,}</td></tr>'
     )
-    st.markdown(report_html, unsafe_allow_html=True)
+accuracy_value = float(report_data["accuracy"])
+report_html = (
+    '<div class="diagnostic-card"><div class="diagnostic-kicker">Per-class quality · positive class is churn</div>'
+    '<table class="report-table"><thead><tr><th>Class</th><th>Precision</th><th>Recall</th>'
+    '<th>F1 score</th><th>Support</th></tr></thead><tbody>'
+    + "".join(report_rows)
+    + f'</tbody></table><div style="display:flex;align-items:center;gap:.65rem;margin:.85rem .15rem .05rem;">'
+    f'<span style="background:#d6e5db;border-radius:10px;padding:.55rem .7rem;font-size:.73rem;font-weight:800;color:#28483a;">Overall accuracy</span>'
+    f'<span style="background:#fffefa;border:1px solid #d5e0e2;border-radius:10px;padding:.55rem .7rem;font:600 .78rem \'DM Mono\',monospace;color:#28483a;">{accuracy_value:.3f}</span>'
+    '</div></div>'
+)
+st.markdown(report_html, unsafe_allow_html=True)
 
 st.markdown("#### Performance notes")
 notes = []
