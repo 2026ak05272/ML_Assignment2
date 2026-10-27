@@ -127,6 +127,19 @@ st.markdown(
     .scorecard-value { color:#fff; font-size:clamp(1.7rem,2.4vw,2.35rem); line-height:1; font-weight:700; letter-spacing:-.06em; font-variant-numeric:tabular-nums; }
     .scorecard-leader { display:block; color:#edf3ff; font-size:.67rem; line-height:1.4; font-weight:600; overflow-wrap:anywhere; }
     .scorecard-leader span { display:block; color:#bcd1ff; font:500 .56rem 'DM Mono',monospace; text-transform:uppercase; letter-spacing:.1em; margin-bottom:.12rem; }
+    .st-key-metric_picker_panel { background:#d6e3f5; border:1px solid #b9cce7; border-radius:16px; padding:.75rem 1rem .9rem; margin:.2rem 0 1.45rem; }
+    .st-key-comparison_chart_panel { background:#d8e4f4; border:1px solid #bfcfe5; border-radius:22px; padding:1.2rem 1.35rem 1.4rem; margin:0 0 2rem; }
+    .st-key-comparison_table_panel { background:#d8e4f4; border:1px solid #bfcfe5; border-radius:22px; padding:1.2rem 1.35rem 1.4rem; margin:0 0 1.7rem; }
+    .comparison-kicker { color:#526a91; font:500 .63rem 'DM Mono',monospace; text-transform:uppercase; letter-spacing:.13em; margin-bottom:.35rem; }
+    .metric-picker-label { display:inline-block; padding:.32rem .62rem; border-radius:8px; background:#244b8d; color:#f4f7ff; font:600 .68rem 'DM Mono',monospace; letter-spacing:.05em; text-transform:uppercase; margin:0 0 .45rem; }
+    .st-key-metric_picker div[data-baseweb="select"] > div { background:#edf3fc !important; border:2px solid #315fa8 !important; border-radius:12px !important; box-shadow:0 0 0 3px #315fa81c !important; min-height:46px; }
+    .st-key-metric_picker div[data-baseweb="select"] div, .st-key-metric_picker div[data-baseweb="select"] input { color:#1e3c70 !important; font-weight:700 !important; }
+    .st-key-metric_picker div[data-baseweb="select"] svg { fill:#244b8d !important; }
+    .st-key-metric_picker .react-aria-ComboBox > div { background:#edf3fc !important; border:2px solid #315fa8 !important; border-radius:12px !important; box-shadow:0 0 0 3px #315fa81c !important; min-height:48px; display:flex; align-items:center; }
+    .st-key-metric_picker input[role="combobox"] { color:#1e3c70 !important; background:transparent !important; font-weight:700 !important; padding:.65rem .8rem !important; }
+    .st-key-metric_picker button[aria-label="Open"] { color:#244b8d !important; background:transparent !important; border:0 !important; }
+    .st-key-metric_picker div[data-testid="stWidgetLabel"] p { color:#244b8d !important; font-weight:800 !important; }
+    .st-key-comparison_table_panel div[data-testid="stDataFrame"] { background:#d8e4f4; border:1px solid #bfcfe5; border-radius:14px; }
     .diagnostic-card { background:#dce7f5; border:1px solid #c4d3e8; border-radius:20px; padding:1.15rem; min-height:300px; }
     .diagnostic-kicker { color:#465f86; font:500 .65rem 'DM Mono',monospace; text-transform:uppercase; letter-spacing:.12em; margin-bottom:.8rem; }
     .heatmap { width:100%; border-collapse:separate; border-spacing:6px; table-layout:fixed; }
@@ -338,20 +351,64 @@ for column, metric_name in zip(metric_columns, summary_metrics):
         unsafe_allow_html=True,
     )
 
-chart_column, table_column = st.columns([0.85, 1.15], gap="large")
-with chart_column:
-    st.markdown("#### Compare the models")
-    chart_metric = st.selectbox(
-        "Metric to visualize",
-        summary_metrics,
-        index=summary_metrics.index("F1"),
-        key="chart_metric",
-    )
-    chart_data = comparison[[chart_metric]].sort_values(chart_metric, ascending=True)
-    st.bar_chart(chart_data, horizontal=True, color="#527c58")
-with table_column:
+st.markdown('<div class="comparison-kicker">Explore one score at a time</div>', unsafe_allow_html=True)
+with st.container(key="metric_picker_panel"):
+    st.markdown('<div class="metric-picker-label">Choose a metric</div>', unsafe_allow_html=True)
+    with st.container(key="metric_picker"):
+        chart_metric = st.selectbox(
+            "Metric to visualize",
+            summary_metrics,
+            index=summary_metrics.index("F1"),
+            key="chart_metric",
+            label_visibility="collapsed",
+        )
+
+chart_data = comparison[[chart_metric]].sort_values(chart_metric, ascending=True).reset_index()
+with st.container(key="comparison_chart_panel"):
+    st.markdown('<div class="comparison-kicker">MODEL VISUALIZATION</div>', unsafe_allow_html=True)
+    st.markdown(f"#### {chart_metric} across classifiers")
+    chart_spec = {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "data": {"values": chart_data.to_dict(orient="records")},
+        "mark": {"type": "bar", "color": "#315fa8", "cornerRadiusEnd": 6, "height": {"band": 0.62}},
+        "encoding": {
+            "y": {
+                "field": "Model", "type": "nominal", "sort": "-x",
+                "axis": {"title": None, "labelColor": "#243d61", "labelFontSize": 12, "labelLimit": 240, "domain": False, "ticks": False},
+            },
+            "x": {
+                "field": chart_metric, "type": "quantitative",
+                "scale": {"domain": [0, 1], "nice": False},
+                "axis": {"title": chart_metric, "titleColor": "#526a91", "labelColor": "#526a91", "gridColor": "#c6d5e9", "tickCount": 6, "format": ".0%"},
+            },
+            "tooltip": [
+                {"field": "Model", "type": "nominal", "title": "Classifier"},
+                {"field": chart_metric, "type": "quantitative", "title": chart_metric, "format": ".3f"},
+            ],
+        },
+        "config": {
+            "background": "#dce7f5",
+            "view": {"stroke": None},
+            "axis": {"labelFont": "Manrope", "titleFont": "Manrope", "gridOpacity": 0.8},
+        },
+        "height": {"step": 42},
+    }
+    st.vega_lite_chart(chart_spec, width="stretch", theme=None, key="model_comparison_chart")
+
+st.markdown('<div class="comparison-kicker">Exact metric values for every saved model</div>', unsafe_allow_html=True)
+with st.container(key="comparison_table_panel"):
     st.markdown("#### Full evaluation table")
-    st.dataframe(comparison.style.format("{:.3f}"), width="stretch")
+    styled_comparison = (
+        comparison.style.format("{:.3f}")
+        .set_properties(**{"background-color": "#dce7f5", "color": "#18345f", "border-color": "#c4d3e8"})
+        .set_table_styles(
+            [
+                {"selector": "th", "props": [("background-color", "#cbdaf0"), ("color", "#203d73"), ("font-weight", "700")]},
+                {"selector": "td", "props": [("padding", "0.7rem 0.85rem")]},
+            ]
+        )
+    )
+    st.dataframe(styled_comparison, width="stretch")
 
 best_f1_model = comparison["F1"].idxmax()
 best_mcc_model = comparison["MCC"].idxmax()
